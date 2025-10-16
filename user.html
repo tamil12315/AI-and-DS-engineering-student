@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Analytics Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #ffffff;
+            color: #333;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #4a6fa5 0%, #6c8ec6 100%);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .logo i {
+            font-size: 28px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+        }
+
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: #4a6fa5;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page-title {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .page-title i {
+            color: #4a6fa5;
+        }
+
+        .stats-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            flex: 1;
+            min-width: 200px;
+            text-align: center;
+            transition: transform 0.3s ease;
+            animation: slideIn 0.5s ease;
+            border: 1px solid #f0f0f0;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card i {
+            font-size: 32px;
+            margin-bottom: 10px;
+            color: #4a6fa5;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin: 10px 0;
+            color: #2c3e50;
+        }
+
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .user-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .user-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.4s ease;
+            animation: cardAppear 0.6s ease;
+            opacity: 0;
+            animation-fill-mode: forwards;
+            border: 1px solid #f0f0f0;
+        }
+
+        .user-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-header {
+            background: linear-gradient(135deg, #4a6fa5 0%, #6c8ec6 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .user-info h3 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .user-info p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .user-details {
+            padding: 20px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #7f8c8d;
+        }
+
+        .detail-value {
+            color: #2c3e50;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .role-admin {
+            background: #e8f4fd;
+            color: #1976d2;
+        }
+
+        .role-user {
+            background: #f0f8f0;
+            color: #388e3c;
+        }
+
+        .user-actions {
+            padding: 15px 20px;
+            background: #f9f9f9;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .action-btn {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .action-btn:hover {
+            background: #f5f5f5;
+            transform: translateY(-2px);
+        }
+
+        .edit-btn {
+            color: #1976d2;
+            border-color: #1976d2;
+        }
+
+        .copy-btn {
+            color: #ff9800;
+            border-color: #ff9800;
+        }
+
+        .delete-btn {
+            color: #d32f2f;
+            border-color: #d32f2f;
+        }
+
+        /* Table Styles */
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            animation: slideUp 0.5s ease;
+            border: 1px solid #f0f0f0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #4a6fa5 0%, #6c8ec6 100%);
+            color: white;
+        }
+
+        th {
+            padding: 16px 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #f5f5f5;
+            transition: background 0.3s ease;
+        }
+
+        tbody tr:hover {
+            background: #f9f9f9;
+        }
+
+        td {
+            padding: 15px;
+            color: #555;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .table-action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .table-edit {
+            color: #1976d2;
+        }
+
+        .table-edit:hover {
+            background: #e8f4fd;
+        }
+
+        .table-copy {
+            color: #ff9800;
+        }
+
+        .table-copy:hover {
+            background: #fff3e0;
+        }
+
+        .table-delete {
+            color: #d32f2f;
+        }
+
+        .table-delete:hover {
+            background: #ffebee;
+        }
+
+        /* Login Page Styles */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #4a6fa5 0%, #6c8ec6 100%);
+        }
+
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 400px;
+            animation: slideUp 0.5s ease;
+        }
+
+        .login-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .login-title i {
+            color: #4a6fa5;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #4a6fa5;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #4a6fa5 0%, #6c8ec6 100%);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #7f8c8d;
+        }
+
+        .register-link a {
+            color: #4a6fa5;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 500px;
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            color: #2c3e50;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+
+        .close-btn:hover {
+            color: #d32f2f;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #4a6fa5;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3d5d8a;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes cardAppear {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: #4caf50;
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.error {
+            background: #f44336;
+        }
+
+        .toast.warning {
+            background: #ff9800;
+        }
+
+        /* Login Button */
+        .login-button-container {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .login-btn-page {
+            background: linear-gradient(135deg, #4a6fa5 0%, #6c8ec6 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .login-btn-page:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* User Actions in Header */
+        .user-actions-header {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .stats-container {
+                flex-direction: column;
+            }
+
+            .user-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+
+            table {
+                min-width: 700px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="login-page" class="login-container">
+        <div class="login-box">
+            <h1 class="login-title">
+                <i class="fas fa-users"></i> User Analytics
+            </h1>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" class="form-control" placeholder="Enter your username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" class="form-control" placeholder="Enter your password" required>
+                </div>
+                <button type="submit" class="login-btn">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+            </form>
+            <div class="register-link">
+                Don't have an account? <a href="#" id="show-register">Register here</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard (Hidden by default) -->
+    <div id="dashboard" style="display: none;">
+        <header>
+            <div class="container">
+                <div class="header-content">
+                    <div class="logo">
+                        <i class="fas fa-users"></i>
+                        <span>User Analytics</span>
+                    </div>
+                    <div class="nav-tabs">
+                        <button class="tab-btn active" data-page="cards-page">
+                            <i class="fas fa-id-card"></i> User Cards
+                        </button>
+                        <button class="tab-btn" data-page="table-page">
+                            <i class="fas fa-table"></i> User Table
+                        </button>
+                    </div>
+                    <div class="user-actions-header">
+                        <span>Welcome, <strong id="current-user">Admin</strong></span>
+                        <button class="logout-btn" id="logout-btn">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="container">
+            <!-- Cards Page -->
+            <div id="cards-page" class="page active">
+                <h1 class="page-title">
+                    <i class="fas fa-user-friends"></i> User Access Overview
+                </h1>
+                
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <i class="fas fa-users"></i>
+                        <div class="stat-value" id="total-users">5</div>
+                        <div class="stat-label">Total Users</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-user-shield"></i>
+                        <div class="stat-value" id="admin-users">1</div>
+                        <div class="stat-label">Admin Users</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-user"></i>
+                        <div class="stat-value" id="regular-users">4</div>
+                        <div class="stat-label">Regular Users</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-clock"></i>
+                        <div class="stat-value" id="latest-registration">2025-10-14</div>
+                        <div class="stat-label">Latest Registration</div>
+                    </div>
+                </div>
+                
+                <div class="user-cards" id="user-cards-container">
+                    <!-- User cards will be generated here -->
+                </div>
+
+                <div class="login-button-container">
+                    <button class="login-btn-page" id="login-btn-page">
+                        <i class="fas fa-sign-in-alt"></i> Login to Access Full Features
+                    </button>
+                </div>
+            </div>
+
+            <!-- Table Page -->
+            <div id="table-page" class="page">
+                <h1 class="page-title">
+                    <i class="fas fa-table"></i> User Access Details
+                </h1>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Password Hash</th>
+                                <th>Registration Date</th>
+                                <th>Role</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="user-table-body">
+                            <!-- Table rows will be generated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div id="edit-user-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Edit User</h2>
+                <button class="close-btn" id="close-edit-modal">&times;</button>
+            </div>
+            <form id="edit-user-form">
+                <input type="hidden" id="edit-user-id">
+                <div class="form-group">
+                    <label for="edit-name">Name</label>
+                    <input type="text" id="edit-name" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-email">Email</label>
+                    <input type="email" id="edit-email" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-password">Password</label>
+                    <input type="text" id="edit-password" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-role">Role</label>
+                    <select id="edit-role" class="form-control" required>
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancel-edit">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toast-message">Operation completed successfully!</span>
+    </div>
+
+    <script>
+        // User data with initial users
+        let users = JSON.parse(localStorage.getItem('users')) || [
+            {
+                id: 1,
+                name: "AAKRAM BASHA",
+                email: "admin@g.c",
+                password: "$2y$10$2QN8Nh.vlcQgNvMjg6kdmezvyvygjwkQ0uDmz4MNShj...",
+                registrationDate: "2025-10-09 19:58:19",
+                role: "user"
+            },
+            {
+                id: 2,
+                name: "Admin",
+                email: "admin@example.com",
+                password: "$2y$10$2QN8Nh.vlcQgNvMjg6kdmezvyvygjwkQ0uDmz4MNShj...",
+                registrationDate: "2025-10-09 19:59:37",
+                role: "admin"
+            },
+            {
+                id: 3,
+                name: "naveen",
+                email: "naveen@g.c",
+                password: "$2y$10$imZt6dxI/XRzh94Dsp.W/ul2qopg1iJKaio0VheoxDY...",
+                registrationDate: "2025-10-10 19:39:43",
+                role: "user"
+            },
+            {
+                id: 4,
+                name: "Adil",
+                email: "adil@gmail.com",
+                password: "1234",
+                registrationDate: "2025-10-14 19:39:43",
+                role: "user"
+            },
+            {
+                id: 5,
+                name: "tharun",
+                email: "tharun@gmail.com",
+                password: "12345",
+                registrationDate: "2025-10-14 19:39:43",
+                role: "user"
+            }
+        ];
+
+        // Save users to localStorage
+        function saveUsers() {
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            
+            toastMessage.textContent = message;
+            toast.className = 'toast';
+            
+            if (type === 'error') {
+                toast.classList.add('error');
+                toast.innerHTML = '<i class="fas fa-exclamation-circle"></i><span id="toast-message">' + message + '</span>';
+            } else if (type === 'warning') {
+                toast.classList.add('warning');
+                toast.innerHTML = '<i class="fas fa-exclamation-triangle"></i><span id="toast-message">' + message + '</span>';
+            } else {
+                toast.innerHTML = '<i class="fas fa-check-circle"></i><span id="toast-message">' + message + '</span>';
+            }
+            
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Generate user cards
+        function generateUserCards() {
+            const container = document.getElementById('user-cards-container');
+            container.innerHTML = '';
+            
+            users.forEach((user, index) => {
+                const card = document.createElement('div');
+                card.className = 'user-card';
+                card.style.animationDelay = `${index * 0.1}s`;
+                
+                const initials = user.name.split(' ').map(n => n[0]).join('');
+                
+                card.innerHTML = `
+                    <div class="user-header">
+                        <div class="user-avatar">${initials}</div>
+                        <div class="user-info">
+                            <h3>${user.name}</h3>
+                            <p>${user.email}</p>
+                        </div>
+                    </div>
+                    <div class="user-details">
+                        <div class="detail-row">
+                            <span class="detail-label">User ID:</span>
+                            <span class="detail-value">${user.id}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Password Hash:</span>
+                            <span class="detail-value">${user.password.substring(0, 20)}...</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Registered:</span>
+                            <span class="detail-value">${user.registrationDate}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Role:</span>
+                            <span class="detail-value">
+                                <span class="role-badge ${user.role === 'admin' ? 'role-admin' : 'role-user'}">
+                                    ${user.role}
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="user-actions">
+                        <button class="action-btn edit-btn" onclick="editUser(${user.id})">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="action-btn copy-btn" onclick="copyUserData(${user.id})">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                        <button class="action-btn delete-btn" onclick="deleteUser(${user.id})">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        // Generate table rows
+        function generateTableRows() {
+            const tbody = document.getElementById('user-table-body');
+            tbody.innerHTML = '';
+            
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${user.id}</td>
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td>${user.password}</td>
+                    <td>${user.registrationDate}</td>
+                    <td>
+                        <span class="role-badge ${user.role === 'admin' ? 'role-admin' : 'role-user'}">
+                            ${user.role}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="table-actions">
+                            <button class="table-action-btn table-edit" onclick="editUser(${user.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="table-action-btn table-copy" onclick="copyUserData(${user.id})">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <button class="table-action-btn table-delete" onclick="deleteUser(${user.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        // Update statistics
+        function updateStatistics() {
+            const totalUsers = users.length;
+            const adminUsers = users.filter(user => user.role === 'admin').length;
+            const regularUsers = totalUsers - adminUsers;
+            
+            let latestRegistration = '';
+            users.forEach(user => {
+                if (!latestRegistration || user.registrationDate > latestRegistration) {
+                    latestRegistration = user.registrationDate;
+                }
+            });
+            
+            document.getElementById('total-users').textContent = totalUsers;
+            document.getElementById('admin-users').textContent = adminUsers;
+            document.getElementById('regular-users').textContent = regularUsers;
+            document.getElementById('latest-registration').textContent = latestRegistration.split(' ')[0];
+        }
+
+        // Edit user function
+        function editUser(userId) {
+            const user = users.find(u => u.id === userId);
+            if (!user) return;
+            
+            document.getElementById('edit-user-id').value = user.id;
+            document.getElementById('edit-name').value = user.name;
+            document.getElementById('edit-email').value = user.email;
+            document.getElementById('edit-password').value = user.password;
+            document.getElementById('edit-role').value = user.role;
+            
+            document.getElementById('edit-user-modal').classList.add('active');
+        }
+
+        // Copy user data function
+        function copyUserData(userId) {
+            const user = users.find(u => u.id === userId);
+            if (!user) return;
+            
+            const userData = `ID: ${user.id}\nName: ${user.name}\nEmail: ${user.email}\nPassword: ${user.password}\nRole: ${user.role}\nRegistered: ${user.registrationDate}`;
+            
+            navigator.clipboard.writeText(userData).then(() => {
+                showToast('User data copied to clipboard!');
+            }).catch(() => {
+                showToast('Failed to copy user data', 'error');
+            });
+        }
+
+        // Delete user function
+        function deleteUser(userId) {
+            const user = users.find(u => u.id === userId);
+            if (!user) return;
+            
+            if (confirm(`Are you sure you want to delete user "${user.name}"?`)) {
+                users = users.filter(u => u.id !== userId);
+                saveUsers();
+                generateUserCards();
+                generateTableRows();
+                updateStatistics();
+                showToast('User deleted successfully!');
+            }
+        }
+
+        // Tab navigation
+        function setupTabNavigation() {
+            document.querySelectorAll('.tab-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    // Update active tab
+                    document.querySelectorAll('.tab-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    button.classList.add('active');
+                    
+                    // Show selected page
+                    const pageId = button.getAttribute('data-page');
+                    document.querySelectorAll('.page').forEach(page => {
+                        page.classList.remove('active');
+                    });
+                    document.getElementById(pageId).classList.add('active');
+                });
+            });
+        }
+
+        // Login functionality
+        function setupLogin() {
+            document.getElementById('login-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                
+                // Simple authentication
+                if (username && password) {
+                    // Hide login page and show dashboard
+                    document.getElementById('login-page').style.display = 'none';
+                    document.getElementById('dashboard').style.display = 'block';
+                    document.getElementById('current-user').textContent = username;
+                    
+                    // Initialize dashboard with proper active page
+                    document.querySelectorAll('.page').forEach(page => {
+                        page.classList.remove('active');
+                    });
+                    document.getElementById('cards-page').classList.add('active');
+                    
+                    // Update active tab
+                    document.querySelectorAll('.tab-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    document.querySelector('[data-page="cards-page"]').classList.add('active');
+                    
+                    // Generate content
+                    generateUserCards();
+                    generateTableRows();
+                    updateStatistics();
+                    setupTabNavigation();
+                    
+                    showToast(`Welcome back, ${username}!`);
+                } else {
+                    showToast('Please enter both username and password', 'error');
+                }
+            });
+            
+            // Login button on the cards page
+            document.getElementById('login-btn-page').addEventListener('click', function() {
+                document.getElementById('dashboard').style.display = 'none';
+                document.getElementById('login-page').style.display = 'flex';
+            });
+            
+            // Show register form
+            document.getElementById('show-register').addEventListener('click', function(e) {
+                e.preventDefault();
+                showToast('Registration would be implemented in a real application', 'warning');
+            });
+            
+            // Logout functionality
+            document.getElementById('logout-btn').addEventListener('click', function() {
+                document.getElementById('dashboard').style.display = 'none';
+                document.getElementById('login-page').style.display = 'flex';
+                showToast('You have been logged out successfully');
+            });
+        }
+
+        // Modal functionality
+        function setupModals() {
+            // Edit user modal
+            document.getElementById('close-edit-modal').addEventListener('click', function() {
+                document.getElementById('edit-user-modal').classList.remove('active');
+            });
+            
+            document.getElementById('cancel-edit').addEventListener('click', function() {
+                document.getElementById('edit-user-modal').classList.remove('active');
+            });
+            
+            document.getElementById('edit-user-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const userId = parseInt(document.getElementById('edit-user-id').value);
+                const userIndex = users.findIndex(u => u.id === userId);
+                
+                if (userIndex !== -1) {
+                    users[userIndex].name = document.getElementById('edit-name').value;
+                    users[userIndex].email = document.getElementById('edit-email').value;
+                    users[userIndex].password = document.getElementById('edit-password').value;
+                    users[userIndex].role = document.getElementById('edit-role').value;
+                    
+                    saveUsers();
+                    generateUserCards();
+                    generateTableRows();
+                    updateStatistics();
+                    
+                    document.getElementById('edit-user-modal').classList.remove('active');
+                    showToast('User updated successfully!');
+                }
+            });
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show the cards page by default
+            generateUserCards();
+            generateTableRows();
+            updateStatistics();
+            setupTabNavigation();
+            setupLogin();
+            setupModals();
+            
+            // Check if user is already logged in
+            const loggedInUser = localStorage.getItem('loggedInUser');
+            if (loggedInUser) {
+                document.getElementById('login-page').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                document.getElementById('current-user').textContent = loggedInUser;
+            }
+        });
+    </script>
+</body>
+</html>
