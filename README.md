@@ -1,1 +1,1 @@
-# AI-and-DS-engineering-student
+# AI&DS Student
